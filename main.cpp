@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <cstring>
-#include "Instance.h"
+#include "Graph.h"
 
 int main(int argc, char *argv[]) {
     std::string instance_filename;
@@ -26,10 +26,11 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    Instance *instance = new Instance();
-    instance->parse(fin_instance);
-    instance->print();
-    delete instance;
+    Graph *graph = new Graph();
+    graph->parse(fin_instance);
+    fin_instance.close();
+    graph->print();
+    delete graph;
 
     return 0;
 }

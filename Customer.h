@@ -5,32 +5,32 @@
 #ifndef VRPTW_ACO_CUSTOMER_H
 #define VRPTW_ACO_CUSTOMER_H
 
+class Graph;
 
 class Customer {
 private:
     const int id;
-    const int x;
-    const int y;
+    const double x;
+    const double y;
     const int demand;
     const int ready_time;
     const int due_date;
     const int service_time;
+    Graph *graph;
 
 public:
 
-    Customer(const int id, const int x, const int y, const int demand, const int ready_time, const int due_date,
-             const int service_time) : id(id), x(x), y(y), demand(demand), ready_time(ready_time), due_date(due_date),
-                                       service_time(service_time) { }
+    Customer(const int id, const double x, const double y, const int demand, const int ready_time, const int due_date, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), ready_time(ready_time), due_date(due_date), service_time(service_time), graph(graph) { }
 
     const int get_id() const {
         return id;
     }
 
-    const int get_x() const {
+    const double get_x() const {
         return x;
     }
 
-    const int get_y() const {
+    const double get_y() const {
         return y;
     }
 
@@ -42,11 +42,11 @@ public:
         return ready_time;
     }
 
-    const int getDue_date() const {
+    const int get_due_date() const {
         return due_date;
     }
 
-    const int getService_time() const {
+    const int get_service_time() const {
         return service_time;
     }
 

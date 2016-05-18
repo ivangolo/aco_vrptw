@@ -4,6 +4,7 @@
 
 #include "Customer.h"
 #include <iostream>
+#include <cmath>
 
 void Customer::print() {
     std::cout << "Customer Id: " << id << std::endl;
@@ -13,5 +14,4 @@ void Customer::print() {
     std::cout << "Ready time: " << ready_time << std::endl;
     std::cout << "Due date: " << due_date << std::endl;
     std::cout << "Service time: " << service_time << std::endl;
-
 }
