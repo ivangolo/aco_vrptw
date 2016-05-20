@@ -13,43 +13,20 @@ private:
     const double x;
     const double y;
     const int demand;
-    const int ready_time;
-    const int due_date;
+    const int ready_time;  // 'Ready time' is the earliest time at which service may start at the given customer/depot.
+    const int due_date;  // 'Due date' is the latest time at which service may start at the given customer/depot.
     const int service_time;
     Graph *graph;
 
 public:
-
-    Customer(const int id, const double x, const double y, const int demand, const int ready_time, const int due_date, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), ready_time(ready_time), due_date(due_date), service_time(service_time), graph(graph) { }
-
-    const int get_id() const {
-        return id;
-    }
-
-    const double get_x() const {
-        return x;
-    }
-
-    const double get_y() const {
-        return y;
-    }
-
-    const int get_demand() const {
-        return demand;
-    }
-
-    const int get_ready_time() const {
-        return ready_time;
-    }
-
-    const int get_due_date() const {
-        return due_date;
-    }
-
-    const int get_service_time() const {
-        return service_time;
-    }
-
+    Customer(const int id, const double x, const double y, const int demand, const int ready_time, const int due_date, const int service_time, Graph *graph);
+    const int get_id() const;
+    const double get_x() const;
+    const double get_y() const;
+    const int get_demand() const;
+    const int get_ready_time() const;
+    const int get_due_date() const;
+    const int get_service_time() const;
     void print();
 };
 

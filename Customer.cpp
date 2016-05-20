@@ -4,7 +4,36 @@
 
 #include "Customer.h"
 #include <iostream>
-#include <cmath>
+
+Customer::Customer(const int id, const double x, const double y, const int demand, const int ready_time, const int due_date, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), ready_time(ready_time), due_date(due_date), service_time(service_time), graph(graph) { }
+
+const int Customer::get_id() const {
+    return id;
+}
+
+const double Customer::get_x() const {
+    return x;
+}
+
+const double Customer::get_y() const {
+    return y;
+}
+
+const int Customer::get_demand() const {
+    return demand;
+}
+
+const int Customer::get_ready_time() const {
+    return ready_time;
+}
+
+const int Customer::get_due_date() const {
+    return due_date;
+}
+
+const int Customer::get_service_time() const {
+    return service_time;
+}
 
 void Customer::print() {
     std::cout << "Customer Id: " << id << std::endl;

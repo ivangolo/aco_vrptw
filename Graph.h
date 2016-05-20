@@ -30,6 +30,8 @@ public:
     void print();
     void print_customers();
     void print_edges();
+    std::deque<Customer*>& get_customers();
+    std::deque<Edge*>& get_edges();
 
 };
 

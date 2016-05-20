@@ -65,12 +65,20 @@ void Graph::create_edges() {
         for (std::deque<Customer*>::iterator target = source; target != customers.end(); ++target) {
 
             if ((*source)->get_id() != (*target)->get_id()) {
-                double long cost = distance_cost_between(*source, *target);
+                long double cost = distance_cost_between(*source, *target);
                 edges.push_back(new Edge(std::make_pair((*source)->get_id(), (*target)->get_id()), cost, this));
             }
 
         }
     }
+}
+
+std::deque<Customer*>& Graph::get_customers() {
+    return customers;
+}
+
+std::deque<Edge*>& Graph::get_edges() {
+    return edges;
 }
 
 void Graph::print_customers() {
