@@ -11,16 +11,18 @@ class Graph;
 
 class Edge {
 private:
-    const std::pair<int, int> edge;
+    const std::pair<int, int> components;
     const long double cost;
-    long double etha;
+    long double etha;  // heuristic value
     double initial_pheromone;
-    double pheromone;
+    double pheromone;  // current pheromone
     Graph* graph;
 
 public:
-    Edge(const std::pair<int, int> &edge, const long double cost, Graph *graph);
-    const long double get_cost() const;
+    Edge(const std::pair<int, int> &components, const long double cost, Graph *graph);
+    const long double get_distance_cost() const;
+    const long double get_travel_time() const;
+    const std::pair<int, int> get_components() const;
     long double get_etha();
     double get_initial_pheromone();
     double get_pheromone();

@@ -5,7 +5,7 @@
 #include "Customer.h"
 #include <iostream>
 
-Customer::Customer(const int id, const double x, const double y, const int demand, const int ready_time, const int due_date, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), ready_time(ready_time), due_date(due_date), service_time(service_time), graph(graph) { }
+Customer::Customer(const int id, const double x, const double y, const int demand, const int earliest_time, const int latest_time, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), earliest_time(earliest_time), latest_time(latest_time), service_time(service_time), graph(graph) { }
 
 const int Customer::get_id() const {
     return id;
@@ -23,12 +23,12 @@ const int Customer::get_demand() const {
     return demand;
 }
 
-const int Customer::get_ready_time() const {
-    return ready_time;
+const int Customer::get_earliest_time() const {
+    return earliest_time;
 }
 
-const int Customer::get_due_date() const {
-    return due_date;
+const int Customer::get_latest_time() const {
+    return latest_time;
 }
 
 const int Customer::get_service_time() const {
@@ -40,7 +40,7 @@ void Customer::print() {
     std::cout << "X coordinate: " << x << std::endl;
     std::cout << "Y coordinate: " << y << std::endl;
     std::cout << "Demand: " << demand << std::endl;
-    std::cout << "Ready time: " << ready_time << std::endl;
-    std::cout << "Due date: " << due_date << std::endl;
+    std::cout << "Ready time: " << earliest_time << std::endl;
+    std::cout << "Due date: " << latest_time << std::endl;
     std::cout << "Service time: " << service_time << std::endl;
 }

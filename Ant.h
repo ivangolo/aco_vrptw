@@ -15,14 +15,21 @@ private:
     Graph *graph;
     Solution *solution;
     int remaining_capacity;
+    std::deque<int> unvisited_customers;
 
 public:
     Ant(Colony *colony, Graph *graph);
     ~Ant();
     Solution* construct_solution();
-    double generate_random_q();
-    bool is_feasible(int i, int j);
-    std::deque<int> feasible_neighborhood(int customer_id);
+    double generate_random_number();
+    bool is_feasible(Customer *last_vertex, Customer *next_vertex);
+    Customer* next_move(Customer *last_vertex);
+    Customer* pseudorandom_proportional_rule(Customer *last_vertex);
+    Customer* random_proportional_rule(Customer *last_vertex);
+    void restart_remaining_capacity();
+
+
+
     // void local_update_of_pheromone();
 
     // construct solution here

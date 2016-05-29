@@ -16,6 +16,6 @@ bool Solution::has_customer(int customer_id) {
     return (position != customers.end()); //true if process is found, false in the other case
 }
 
-int Solution::last_visited_customer() {
-    return customers.back();
+Customer* Solution::last_visited_vertex() {
+    graph->get_customer(customers.back());
 }

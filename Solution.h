@@ -19,7 +19,7 @@ public:
     Solution(Graph *grap);
     void add_customer(int customer_id);
     bool has_customer(int customer_id);
-    int last_visited_customer();
+    Customer*  last_visited_vertex();
     // cost calculation
 };
 

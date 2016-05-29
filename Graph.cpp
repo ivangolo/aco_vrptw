@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <numeric>
 
 Graph::~Graph() {
     std::for_each(customers.begin(), customers.end(), std::default_delete<Customer>());
@@ -55,6 +56,15 @@ Customer* Graph::get_customer(int id) {
     return customers[id];
 }
 
+Edge* Graph::get_edge(int i, int j) {
+    std::deque<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
+                        int first = edge->get_components().first;
+                        int second = edge->get_components().second;
+                        return ((i == first && j == second) || (i == second && j == first));
+                    });
+    return *it;
+}
+
 long double Graph::distance_cost_between(Customer* c1, Customer* c2) {
     return std::hypot(c1->get_x() - c2->get_x(), c1->get_y() - c2->get_y());
 }
@@ -81,18 +91,43 @@ std::deque<Edge*>& Graph::get_edges() {
     return edges;
 }
 
-void Graph::print_customers() {
+std::deque<Edge*> Graph::get_edges(Customer *c1) {
+    std::deque<Edge*> selection(edges.size());
+
+    auto it = std::copy_if (edges.begin(), edges.end(), selection.begin(), [c1] (Edge *i){
+        return (i->get_components().first == c1->get_id() || i->get_components().second == c1->get_id());} );
+
+    selection.resize(std::distance(selection.begin(), it));
+
+    return selection;
+}
+
+std::deque<Edge*> Graph::get_edges(Customer *c1, std::deque<int> customers) {
+    std::deque<Edge*> selection;
+    for (std::deque<int>::iterator i = customers.begin(); i != customers.end(); ++i) {
+        selection.push_back(get_edge(c1->get_id(), get_customer(*i)->get_id()));
+    }
+    return selection;
+}
+
+std::deque<int> Graph::get_customers_ids() {
+    std::deque<int> ids(customers.size() - 1);
+    std::iota(ids.begin(), ids.end(), 1);
+    return ids;
+}
+
+void Graph::print_customers(std::deque<Customer*> customers_vec) {
     std::cout << "::::::::::::::: Customers :::::::::::::::" << std::endl;
-    for (std::deque<Customer*>::iterator customer = customers.begin(); customer != customers.end(); ++customer) {
+    for (std::deque<Customer*>::iterator customer = customers_vec.begin(); customer != customers_vec.end(); ++customer) {
         std::cout << "::::::::::::::::::::::::::::::::::::::::" << std::endl;
         (*customer)->print();
 
     }
 }
 
-void Graph::print_edges() {
+void Graph::print_edges(std::deque<Edge*> edges_vec) {
     std::cout << "::::::::::::::: Edges :::::::::::::::" << std::endl;
-    for (std::deque<Edge*>::iterator edge = edges.begin(); edge != edges.end(); ++edge) {
+    for (std::deque<Edge*>::iterator edge = edges_vec.begin(); edge != edges_vec.end(); ++edge) {
         (*edge)->print();
     }
 }
@@ -104,6 +139,6 @@ void Graph::print() {
     std::cout << "Number of Customers: " << customers.size() - 1 << std::endl;
     std::cout << "Number of Edges: " << edges.size() << std::endl;
 
-    print_customers();
-    print_edges();
+    print_customers(customers);
+    print_edges(edges);
 }
