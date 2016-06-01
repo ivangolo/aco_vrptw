@@ -4,7 +4,7 @@
 
 #ifndef VRPTW_ACO_GRAPH_H
 #define VRPTW_ACO_GRAPH_H
-#include <deque>
+#include <vector>
 #include <string>
 #include "Customer.h"
 #include "Edge.h"
@@ -14,8 +14,8 @@ private:
     int vehicle_number;
     int vehicle_capacity;
     std::string name;
-    std::deque<Customer*> customers;
-    std::deque<Edge*> edges;
+    std::vector<Customer*> customers;
+    std::vector<Edge*> edges;
 
 public:
 
@@ -23,19 +23,20 @@ public:
     ~Graph();
     int get_vehicle_number();
     int get_vehicle_capacity();
+    unsigned long get_customers_number();
     std::string get_name();
     Customer* get_customer(int id);
     Edge* get_edge(int i, int j);
     long double distance_cost_between(Customer* c1, Customer* c2);
     void create_edges();
     void print();
-    void print_customers(std::deque<Customer*> customers_vec);
-    void print_edges(std::deque<Edge*> edges_vec);
-    std::deque<Customer*>& get_customers();
-    std::deque<Edge*>& get_edges();
-    std::deque<Edge*> get_edges(Customer *c1);
-    std::deque<Edge*> get_edges(Customer *c1, std::deque<int> customers);
-    std::deque<int> get_customers_ids();
+    void print_customers(std::vector<Customer*> customers_vec);
+    void print_edges(std::vector<Edge*> edges_vec);
+    const std::vector<Customer*>& get_customers() const ;
+    const std::vector<Edge*>& get_edges() const;
+    std::vector<Edge*> get_edges(Customer *c1);
+    std::vector<Edge*> get_edges(Customer *c1, std::vector<int> customers);
+    std::vector<int> get_customers_ids();
 };
 
 

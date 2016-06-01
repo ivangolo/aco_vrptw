@@ -15,29 +15,23 @@ private:
     Graph *graph;
     Solution *solution;
     int remaining_capacity;
-    std::deque<int> unvisited_customers;
+    std::vector<int> unvisited_customers;
 
 public:
     Ant(Colony *colony, Graph *graph);
     ~Ant();
-    Solution* construct_solution();
+    void run();
     double generate_random_number();
     bool is_feasible(Customer *last_vertex, Customer *next_vertex);
     Customer* next_move(Customer *last_vertex);
     Customer* pseudorandom_proportional_rule(Customer *last_vertex);
     Customer* random_proportional_rule(Customer *last_vertex);
     void restart_remaining_capacity();
-
-
-
-    // void local_update_of_pheromone();
-
-    // construct solution here
-    // add a new customer in a greedy way (only feasable addings)
-    // until all customers are visited
-    // calculate solution cost
-    // compare with best solution found so far
-    // deposit pheromone after solution construction (local update)
+    void return_to_the_depot();
+    void local_pheromone_trail_update(Edge * edge);
+    void print_unvisited_customers();
+    void restart();
+    Solution* get_solution();
 
 };
 

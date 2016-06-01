@@ -31,14 +31,12 @@ int main(int argc, char *argv[]) {
     Graph *graph = new Graph();
     graph->parse(fin_instance);
     fin_instance.close();
-    Colony *ant_colony = new Colony(1.0, 1.0, 1.0, 10, 10, 0.9, 1.0, graph);
+    Colony *ant_colony;
+    ant_colony = new Colony(1.0, 1.0, 0.01, 7, 5, 0.9, 1.0, graph);  // alfa, beta, evaporation, ants, iterations, q0, initial pheromone, graph pointer
     ant_colony->deposit_initial_pheromone();
-    Customer *c1 = graph->get_customer(7);
-    std::deque<int> v {1,2,5,9};
-    std::deque<Edge*> edges = graph->get_edges(c1, v);
-    graph->print_edges(edges);
-
-    delete graph;
+    ant_colony->run();
     delete ant_colony;
+    delete graph;
+
     return 0;
 }

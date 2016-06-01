@@ -21,17 +21,21 @@ const std::pair<int, int> Edge::get_components() const {
     return components;
 }
 
-double Edge::get_initial_pheromone() {
+long double Edge::get_initial_pheromone() {
     return initial_pheromone;
 }
 
-void Edge::set_initial_pheromone(double initial_pheromone) {
+void Edge::set_initial_pheromone(long double initial_pheromone) {
     this->initial_pheromone = initial_pheromone;
     this->pheromone = initial_pheromone;
 }
 
-double Edge::get_pheromone() {
+long double Edge::get_pheromone() {
     return pheromone;
+}
+
+void Edge::set_pheromone(long double pheromone) {
+    this->pheromone = pheromone;
 }
 
 long double Edge::get_etha() {

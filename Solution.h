@@ -6,21 +6,24 @@
 #define VRPTW_ACO_SOLUTION_H
 
 
-#include <deque>
+#include <vector>
 #include "Graph.h"
 
 class Solution {
 private:
     Graph *graph;
-    std::deque<int> customers;
-
+    std::vector<int> tour;
 
 public:
     Solution(Graph *grap);
     void add_customer(int customer_id);
     bool has_customer(int customer_id);
     Customer*  last_visited_vertex();
-    // cost calculation
+    void print();
+    const std::vector<int>& get_tour() const;
+    void set_tour(std::vector<int> tour);
+    void restart();
+    double cost();
 };
 
 

@@ -23,8 +23,8 @@ void Graph::parse(std::ifstream &fin_instance) {
     fin_instance >> tmp;  // VEHICLE
     fin_instance >> tmp;  // NUMBER
     fin_instance >> tmp;  // CAPACITY
-    fin_instance >> vehicle_capacity;
     fin_instance >> vehicle_number;
+    fin_instance >> vehicle_capacity;
     fin_instance >> tmp;  // CUSTOMER
     while(tmp.compare("SERVICE") != 0) {
         fin_instance >> tmp;
@@ -57,7 +57,7 @@ Customer* Graph::get_customer(int id) {
 }
 
 Edge* Graph::get_edge(int i, int j) {
-    std::deque<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
+    std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
                         int first = edge->get_components().first;
                         int second = edge->get_components().second;
                         return ((i == first && j == second) || (i == second && j == first));
@@ -70,9 +70,9 @@ long double Graph::distance_cost_between(Customer* c1, Customer* c2) {
 }
 
 void Graph::create_edges() {
-    for (std::deque<Customer*>::iterator source = customers.begin(); source != customers.end(); ++source) {
+    for (std::vector<Customer*>::iterator source = customers.begin(); source != customers.end(); ++source) {
 
-        for (std::deque<Customer*>::iterator target = source; target != customers.end(); ++target) {
+        for (std::vector<Customer*>::iterator target = source; target != customers.end(); ++target) {
 
             if ((*source)->get_id() != (*target)->get_id()) {
                 long double cost = distance_cost_between(*source, *target);
@@ -83,51 +83,56 @@ void Graph::create_edges() {
     }
 }
 
-std::deque<Customer*>& Graph::get_customers() {
+const std::vector<Customer*>& Graph::get_customers() const {
     return customers;
 }
 
-std::deque<Edge*>& Graph::get_edges() {
+const std::vector<Edge*>& Graph::get_edges() const {
     return edges;
 }
 
-std::deque<Edge*> Graph::get_edges(Customer *c1) {
-    std::deque<Edge*> selection(edges.size());
+std::vector<Edge*> Graph::get_edges(Customer *c1) {
+    std::vector<Edge*> selection(edges.size());
 
-    auto it = std::copy_if (edges.begin(), edges.end(), selection.begin(), [c1] (Edge *i){
-        return (i->get_components().first == c1->get_id() || i->get_components().second == c1->get_id());} );
+    auto it = std::copy_if (edges.begin(), edges.end(), selection.begin(), [c1] (Edge *i) {
+        return (i->get_components().first == c1->get_id() || i->get_components().second == c1->get_id());
+    } );
 
     selection.resize(std::distance(selection.begin(), it));
 
     return selection;
 }
 
-std::deque<Edge*> Graph::get_edges(Customer *c1, std::deque<int> customers) {
-    std::deque<Edge*> selection;
-    for (std::deque<int>::iterator i = customers.begin(); i != customers.end(); ++i) {
+std::vector<Edge*> Graph::get_edges(Customer *c1, std::vector<int> customers) {
+    std::vector<Edge*> selection;
+    for (std::vector<int>::iterator i = customers.begin(); i != customers.end(); ++i) {
         selection.push_back(get_edge(c1->get_id(), get_customer(*i)->get_id()));
     }
     return selection;
 }
 
-std::deque<int> Graph::get_customers_ids() {
-    std::deque<int> ids(customers.size() - 1);
+std::vector<int> Graph::get_customers_ids() {
+    std::vector<int> ids(customers.size() - 1);
     std::iota(ids.begin(), ids.end(), 1);
     return ids;
 }
 
-void Graph::print_customers(std::deque<Customer*> customers_vec) {
+unsigned long Graph::get_customers_number() {
+    return customers.size();
+}
+
+void Graph::print_customers(std::vector<Customer*> customers_vec) {
     std::cout << "::::::::::::::: Customers :::::::::::::::" << std::endl;
-    for (std::deque<Customer*>::iterator customer = customers_vec.begin(); customer != customers_vec.end(); ++customer) {
+    for (std::vector<Customer*>::iterator customer = customers_vec.begin(); customer != customers_vec.end(); ++customer) {
         std::cout << "::::::::::::::::::::::::::::::::::::::::" << std::endl;
         (*customer)->print();
 
     }
 }
 
-void Graph::print_edges(std::deque<Edge*> edges_vec) {
+void Graph::print_edges(std::vector<Edge*> edges_vec) {
     std::cout << "::::::::::::::: Edges :::::::::::::::" << std::endl;
-    for (std::deque<Edge*>::iterator edge = edges_vec.begin(); edge != edges_vec.end(); ++edge) {
+    for (std::vector<Edge*>::iterator edge = edges_vec.begin(); edge != edges_vec.end(); ++edge) {
         (*edge)->print();
     }
 }

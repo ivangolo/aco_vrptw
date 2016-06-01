@@ -14,8 +14,8 @@ private:
     const std::pair<int, int> components;
     const long double cost;
     long double etha;  // heuristic value
-    double initial_pheromone;
-    double pheromone;  // current pheromone
+    long double initial_pheromone;
+    long double pheromone;  // current pheromone
     Graph* graph;
 
 public:
@@ -24,9 +24,10 @@ public:
     const long double get_travel_time() const;
     const std::pair<int, int> get_components() const;
     long double get_etha();
-    double get_initial_pheromone();
-    double get_pheromone();
-    void set_initial_pheromone(double initial_pheromone);
+    long double get_initial_pheromone();
+    long double get_pheromone();
+    void set_initial_pheromone(long double initial_pheromone);
+    void set_pheromone(long double pheromone);
     void print();
 };
 
