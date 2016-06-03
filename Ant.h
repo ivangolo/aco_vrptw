@@ -27,10 +27,12 @@ public:
     Customer* pseudorandom_proportional_rule(Customer *last_vertex);
     Customer* random_proportional_rule(Customer *last_vertex);
     void restart_remaining_capacity();
+    void make_customer_visited(int customer_id);
     void return_to_the_depot();
     void local_pheromone_trail_update(Edge * edge);
-    void print_unvisited_customers();
     void restart();
+    std::vector<Edge*> feasible_edges(Customer *last_vertex);
+
     Solution* get_solution();
 
 };

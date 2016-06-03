@@ -33,19 +33,26 @@ double Ant::generate_random_number() {
 bool Ant::is_feasible(Customer *last_vertex, Customer *next_vertex) {
     // check capacity and time constraints
     Edge *edge = graph->get_edge(last_vertex->get_id(), next_vertex->get_id());
-
     if(next_vertex->get_demand() <= remaining_capacity) {  // capacity constraint
-
         if(last_vertex->get_earliest_time() + last_vertex->get_service_time() + edge->get_travel_time() <= next_vertex->get_latest_time()) {  // time constraint
             return true;
         }
-
     }
     return false;
 }
 
 void Ant::restart_remaining_capacity() {
     remaining_capacity = graph->get_vehicle_capacity();
+}
+
+std::vector<Edge*> Ant::feasible_edges(Customer *last_vertex) {
+    std::vector<Edge*> feasibles;
+    for (auto j = unvisited_customers.begin(); j != unvisited_customers.end(); ++j) {
+        if(is_feasible(last_vertex, graph->get_customer(*j))) {
+            feasibles.push_back(graph->get_edge(last_vertex->get_id(), *j));
+        }
+    }
+    return feasibles;
 }
 
 Customer* Ant::next_move(Customer *last_vertex) {
@@ -62,31 +69,30 @@ Customer* Ant::next_move(Customer *last_vertex) {
 }
 
 Customer* Ant::pseudorandom_proportional_rule(Customer *last_vertex) {
-    std::vector<Edge*> edges = graph->get_edges(last_vertex, unvisited_customers);
-//    std::for_each(edges.begin(), edges.end(), [](Edge* edge) {
-//        edge->print();
-//    });
-
+    // std::vector<Edge*> edges = graph->get_edges(last_vertex, unvisited_customers);
+    std::vector<Edge*> edges = feasible_edges(last_vertex);
+    if (edges.empty()) {
+        return NULL;
+    }
     std::vector<Edge*>::iterator max = std::max_element(edges.begin(), edges.end(), [this] (Edge* a, Edge* b) {
         return (a->get_pheromone()*std::pow(a->get_etha(), colony->get_beta())) < (b->get_pheromone()*std::pow(b->get_etha(), colony->get_beta()));
     });
 
     Customer *first = graph->get_customer((*max)->get_components().first);
     Customer *second = graph->get_customer((*max)->get_components().second);
-
     return last_vertex->get_id() != first->get_id() ? first : second;
 }
 
 Customer* Ant::random_proportional_rule(Customer *last_vertex) {
-    std::vector<Edge*> edges = graph->get_edges(last_vertex, unvisited_customers);
-//    std::for_each(edges.begin(), edges.end(), [](Edge* edge) {
-//        edge->print();
-//    });
-
+    // std::vector<Edge*> edges = graph->get_edges(last_vertex, unvisited_customers);
+    std::vector<Edge*> edges = feasible_edges(last_vertex);
+    if (edges.empty()) {
+        return NULL;
+    }
     long double sum_weights = 0;
     std::deque<std::pair<Edge*, long double>> weights;
     std::for_each(edges.begin(), edges.end(), [this, &weights, &sum_weights](Edge* edge) {
-        long double weight = std::pow(edge->get_pheromone(), colony->get_alpha()) * std::pow(edge->get_etha(), colony->get_beta());
+        long double weight = edge->get_pheromone() * std::pow(edge->get_etha(), colony->get_beta());
         weights.push_back(std::make_pair(edge, weight));
         sum_weights += weight;
     });
@@ -100,11 +106,13 @@ Customer* Ant::random_proportional_rule(Customer *last_vertex) {
             break;
         }
     }
-
     Customer *first = graph->get_customer((*weight).first->get_components().first);
     Customer *second = graph->get_customer((*weight).first->get_components().second);
-
     return last_vertex->get_id() != first->get_id() ? first : second;
+}
+
+void Ant::make_customer_visited(int customer_id) {
+    unvisited_customers.erase(std::remove(unvisited_customers.begin(), unvisited_customers.end(), customer_id), unvisited_customers.end());
 }
 
 void Ant::return_to_the_depot() {
@@ -114,19 +122,17 @@ void Ant::return_to_the_depot() {
 
 void Ant::run() {
     solution->add_customer(0); // depot as starting point
-
     while(!unvisited_customers.empty()) {
         Customer *last_visited = solution->last_visited_vertex();
         Customer *next_customer = next_move(last_visited);
 
-        // check feasibility here
-        if(is_feasible(last_visited, next_customer)) {
+        if (next_customer) {
             // add the next customer to the solution
             solution->add_customer(next_customer->get_id());
             // decreasing capacity
             remaining_capacity -= next_customer->get_demand();
             // removing from unvisited customers
-            unvisited_customers.erase(std::remove(unvisited_customers.begin(), unvisited_customers.end(), next_customer->get_id()), unvisited_customers.end());
+            make_customer_visited(next_customer->get_id());
             // do local pheromone trail update
             local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), next_customer->get_id()));
         } else {
@@ -136,6 +142,23 @@ void Ant::run() {
             local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), 0));
         }
 
+//        // check feasibility here
+//        if(is_feasible(last_visited, next_customer)) {
+//            // add the next customer to the solution
+//            solution->add_customer(next_customer->get_id());
+//            // decreasing capacity
+//            remaining_capacity -= next_customer->get_demand();
+//            // removing from unvisited customers
+//            unvisited_customers.erase(std::remove(unvisited_customers.begin(), unvisited_customers.end(), next_customer->get_id()), unvisited_customers.end());
+//            // do local pheromone trail update
+//            local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), next_customer->get_id()));
+//        } else {
+//            // Return to the depot
+//            return_to_the_depot();
+//            // do local pheromone trail update
+//            local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), 0));
+//        }
+
     }
     solution->add_customer(0); // depot as final point
 
@@ -144,7 +167,7 @@ void Ant::run() {
 
 void Ant::local_pheromone_trail_update(Edge *edge) {
     long double old_pheromone = edge->get_pheromone();
-    long double new_pheromone = (1 - colony->get_evaporation())*old_pheromone + colony->get_evaporation()*edge->get_initial_pheromone();
+    long double new_pheromone = (1 - colony->get_local_evaporation())*old_pheromone + colony->get_local_evaporation()*edge->get_initial_pheromone();
     edge->set_pheromone(new_pheromone);
 }
 
@@ -155,12 +178,5 @@ void Ant::restart() {
     unvisited_customers = graph->get_customers_ids();
     // restart solution tour
     solution->restart();
-
-}
-
-void Ant::print_unvisited_customers() {
-    std::cout << "Unvisited: [";
-    copy(unvisited_customers.begin(), unvisited_customers.end(), std::ostream_iterator<int>(std::cout, ", "));
-    std::cout << "]"<< std::endl;
 
 }

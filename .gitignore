@@ -1,5 +1,9 @@
 .idea
 CMakeLists.txt
+bin
+build
+Makefile
+aco_vprtw
 
 # Compiled Object files
 *.slo

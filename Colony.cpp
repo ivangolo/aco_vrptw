@@ -7,7 +7,7 @@
 #include <iostream>
 #include <memory>
 
-Colony::Colony(const double alpha, const double beta, const double evaporation, const int size, const int max_iterations, const double q0, const double initial_pheromone, Graph *graph) : alpha(alpha), beta(beta), evaporation(evaporation), size(size), max_iterations(max_iterations), q0(q0), initial_pheromone(initial_pheromone), graph(graph) {
+Colony::Colony(const double beta, const double phi, const double xi, const int size, const int max_iterations, const double q0, const double initial_pheromone, Graph *graph) : beta(beta), phi(phi), xi(xi), size(size), max_iterations(max_iterations), q0(q0), initial_pheromone(initial_pheromone), graph(graph) {
     create_ants();
     best_solution = new Solution(graph);
 }
@@ -23,16 +23,22 @@ Colony::~Colony() {
     delete best_solution;
 }
 
+/*
 const double Colony::get_alpha() const {
     return alpha;
 }
+ */
 
 const double Colony::get_beta() const {
     return beta;
 }
 
 const double Colony::get_evaporation() const {
-    return evaporation;
+    return phi;
+}
+
+const double Colony::get_local_evaporation() const {
+    return xi;
 }
 
 const int Colony::get_size() const {
@@ -54,7 +60,6 @@ void Colony::deposit_initial_pheromone() {
 }
 
 void Colony::run() {
-
     for (int i = 0; i < max_iterations; ++i) {
         std::cout << "::::::::::::::::::::::::::::::::::Iteration: " << i << " :::::::::::::::::::::::::::::::::" << std::endl;
         step();
@@ -82,7 +87,7 @@ void Colony::global_update_pheromone_trail() {
     for (std::vector<int>::const_iterator v = best_solution->get_tour().begin(); v != best_solution->get_tour().end() - 1; ++v) {
         Edge *edge = graph->get_edge(*v, *(v+1));
         long double old_pheromone = edge->get_pheromone();
-        long double new_pheromone = (1 - evaporation)*old_pheromone + evaporation*(1.0/best_solution_cost);
+        long double new_pheromone = (1 - phi)*old_pheromone + phi*(1.0/best_solution_cost);
         edge->set_pheromone(new_pheromone);
     }
 }
