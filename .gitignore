@@ -3,7 +3,7 @@ CMakeLists.txt
 bin
 build
 Makefile
-aco_vprtw
+aco_vrptw
 
 # Compiled Object files
 *.slo
