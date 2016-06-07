@@ -13,11 +13,6 @@ void Solution::add_customer(int customer_id) {
     tour.push_back(customer_id);
 }
 
-bool Solution::has_customer(int customer_id) {
-    std::vector<int>::iterator position = std::find(tour.begin(), tour.end(), customer_id);
-    return (position != tour.end()); //true if process is found, false in the other case
-}
-
 Customer* Solution::last_visited_vertex() {
     return graph->get_customer(tour.back());
 }
@@ -27,6 +22,7 @@ void Solution::print() {
     copy(tour.begin(), tour.end(), std::ostream_iterator<int>(std::cout, ", "));
     std::cout << "]"<< std::endl;
     std::cout << "Cost: " << cost() << std::endl;
+    std::cout << "Number of Vehicles: " << number_of_vehicles() << std::endl;
 }
 
 const std::vector<int>& Solution::get_tour() const {
@@ -49,6 +45,17 @@ double Solution::cost() {
     }
 
     return cost;
+}
+
+int Solution::number_of_vehicles() {
+    if (tour.empty()) {
+        return 0;
+    }
+
+    int number_of_vehicles = (int) std::count(tour.begin(), tour.end(), 0);
+    number_of_vehicles -= 1;
+
+    return number_of_vehicles;
 }
 
 void Solution::restart() {

@@ -15,6 +15,7 @@ private:
     Graph *graph;
     Solution *solution;
     int remaining_capacity;
+    long double last_arrival_time;
     std::vector<int> unvisited_customers;
 
 public:
@@ -26,11 +27,12 @@ public:
     Customer* next_move(Customer *last_vertex);
     Customer* pseudorandom_proportional_rule(Customer *last_vertex);
     Customer* random_proportional_rule(Customer *last_vertex);
-    void restart_remaining_capacity();
     void make_customer_visited(int customer_id);
     void return_to_the_depot();
     void local_pheromone_trail_update(Edge * edge);
     void restart();
+    void update_capacity(Customer *new_customer);
+    void update_last_arrival_time(Customer *last_vertex, Customer *new_customer);
     std::vector<Edge*> feasible_edges(Customer *last_vertex);
 
     Solution* get_solution();

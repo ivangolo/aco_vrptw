@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <cstring>
-#include <cstdlib>
 #include <algorithm>
 #include "Graph.h"
 #include "Colony.h"
@@ -81,9 +80,8 @@ int main(int argc, char *argv[]) {
     delete ant_colony;
     delete graph;
 
-    return 0;
 }
 
 void print_usage() {
-    std::cout << "Uso: aco_vrptw " << std::endl;
+    std::cout << "Usage: aco_vrptw []" << std::endl;
 }
