@@ -26,9 +26,10 @@ public:
     unsigned long get_customers_number();
     std::string get_name();
     Customer* get_customer(int id);
-    Edge* get_edge(int i, int j);
-    long double distance_cost_between(Customer* c1, Customer* c2);
+    Edge* get_edge(int start, int end);
+    long double distance_between(Customer* c1, Customer* c2);
     void create_edges();
+    bool check_edge(Customer *start, Customer *end);
     void print();
     void print_customers(std::vector<Customer*> customers_vec);
     void print_edges(std::vector<Edge*> edges_vec);

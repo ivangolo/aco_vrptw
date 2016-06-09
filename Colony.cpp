@@ -23,33 +23,15 @@ Colony::~Colony() {
     delete best_solution;
 }
 
-/*
-const double Colony::get_alpha() const {
-    return alpha;
-}
- */
-
-const double Colony::get_beta() const {
+double Colony::get_beta(){
     return beta;
 }
 
-const double Colony::get_evaporation() const {
-    return phi;
-}
-
-const double Colony::get_local_evaporation() const {
+double Colony::get_local_evaporation(){
     return xi;
 }
 
-const int Colony::get_size() const {
-    return size;
-}
-
-const int Colony::get_max_iterations() const {
-    return max_iterations;
-}
-
-const double Colony::get_q0() const {
+double Colony::get_q0() {
     return q0;
 }
 
@@ -60,7 +42,7 @@ void Colony::deposit_initial_pheromone() {
 }
 
 void Colony::run() {
-    for (int i = 0; i < max_iterations; ++i) {
+    for (int i = 1; i <= max_iterations; ++i) {
         std::cout << "::::::::::::::::::::::::::::::::::Iteration: " << i << " :::::::::::::::::::::::::::::::::" << std::endl;
         step();
     }

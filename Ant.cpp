@@ -34,6 +34,11 @@ double Ant::generate_random_number() {
 bool Ant::is_feasible(Customer *last_vertex, Customer *next_vertex) {
     // check capacity and time constraints
     Edge *edge = graph->get_edge(last_vertex->get_id(), next_vertex->get_id());
+
+    if (!edge) {
+        return false;
+    }
+
     if(next_vertex->get_demand() <= remaining_capacity) {  // capacity constraint
 
         if (last_arrival_time + last_vertex->get_service_time() + edge->get_travel_time() <= next_vertex->get_latest_time()) {  // time constraint
@@ -71,10 +76,7 @@ Customer* Ant::pseudorandom_proportional_rule(Customer *last_vertex) {
     std::vector<Edge*>::iterator max = std::max_element(edges.begin(), edges.end(), [this] (Edge* a, Edge* b) {
         return (a->get_pheromone()*std::pow(a->get_etha(), colony->get_beta())) < (b->get_pheromone()*std::pow(b->get_etha(), colony->get_beta()));
     });
-
-    Customer *first = graph->get_customer((*max)->get_components().first);
-    Customer *second = graph->get_customer((*max)->get_components().second);
-    return last_vertex->get_id() != first->get_id() ? first : second;
+    return graph->get_customer((*max)->get_components().second);
 }
 
 Customer* Ant::random_proportional_rule(Customer *last_vertex) {
@@ -99,9 +101,7 @@ Customer* Ant::random_proportional_rule(Customer *last_vertex) {
             break;
         }
     }
-    Customer *first = graph->get_customer((*weight).first->get_components().first);
-    Customer *second = graph->get_customer((*weight).first->get_components().second);
-    return last_vertex->get_id() != first->get_id() ? first : second;
+    return graph->get_customer((*weight).first->get_components().second);
 }
 
 void Ant::make_customer_visited(int customer_id) {
@@ -139,7 +139,6 @@ void Ant::run() {
     }
     solution->add_customer(0); // depot as final point
 }
-
 
 void Ant::local_pheromone_trail_update(Edge *edge) {
     long double old_pheromone = edge->get_pheromone();

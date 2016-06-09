@@ -7,31 +7,31 @@
 
 Customer::Customer(const int id, const double x, const double y, const int demand, const int earliest_time, const int latest_time, const int service_time, Graph *graph) : id(id), x(x), y(y), demand(demand), earliest_time(earliest_time), latest_time(latest_time), service_time(service_time), graph(graph) { }
 
-const int Customer::get_id() const {
+int Customer::get_id() {
     return id;
 }
 
-const double Customer::get_x() const {
+double Customer::get_x() {
     return x;
 }
 
-const double Customer::get_y() const {
+double Customer::get_y() {
     return y;
 }
 
-const int Customer::get_demand() const {
+int Customer::get_demand() {
     return demand;
 }
 
-const int Customer::get_earliest_time() const {
+int Customer::get_earliest_time() {
     return earliest_time;
 }
 
-const int Customer::get_latest_time() const {
+int Customer::get_latest_time() {
     return latest_time;
 }
 
-const int Customer::get_service_time() const {
+int Customer::get_service_time() {
     return service_time;
 }
 

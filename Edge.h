@@ -20,9 +20,9 @@ private:
 
 public:
     Edge(const std::pair<int, int> &components, const long double cost, Graph *graph);
-    const long double get_distance_cost() const;
-    const long double get_travel_time() const;
-    const std::pair<int, int> get_components() const;
+    long double get_distance_cost();
+    long double get_travel_time();
+    std::pair<int, int> get_components();
     long double get_etha();
     long double get_initial_pheromone();
     long double get_pheromone();

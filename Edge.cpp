@@ -9,15 +9,15 @@ Edge::Edge(const std::pair<int, int> &components, const long double cost, Graph 
     etha = 1/cost;
 }
 
-const long double Edge::get_distance_cost() const {
+long double Edge::get_distance_cost() {
     return cost;
 }
 
-const long double Edge::get_travel_time() const {
+long double Edge::get_travel_time() {
     return cost;
 }
 
-const std::pair<int, int> Edge::get_components() const {
+std::pair<int, int> Edge::get_components() {
     return components;
 }
 

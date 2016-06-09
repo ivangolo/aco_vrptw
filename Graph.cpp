@@ -56,29 +56,37 @@ Customer* Graph::get_customer(int id) {
     return customers[id];
 }
 
-Edge* Graph::get_edge(int i, int j) {
-    std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
+// Edge* Graph::get_edge(int i, int j) {
+//     std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
+//                         int first = edge->get_components().first;
+//                         int second = edge->get_components().second;
+//                         return ((i == first && j == second) || (i == second && j == first));
+//                     });
+//     return *it;
+// }
+
+Edge* Graph::get_edge(int start, int end) {
+    std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [start, end] (Edge *edge) {
                         int first = edge->get_components().first;
                         int second = edge->get_components().second;
-                        return ((i == first && j == second) || (i == second && j == first));
+                        return start == first && end == second;
                     });
     return *it;
 }
 
-long double Graph::distance_cost_between(Customer* c1, Customer* c2) {
+long double Graph::distance_between(Customer* c1, Customer* c2) {
     return std::hypot(c1->get_x() - c2->get_x(), c1->get_y() - c2->get_y());
 }
 
 void Graph::create_edges() {
     for (std::vector<Customer*>::iterator source = customers.begin(); source != customers.end(); ++source) {
 
-        for (std::vector<Customer*>::iterator target = source; target != customers.end(); ++target) {
+        for (std::vector<Customer*>::iterator target = customers.begin(); target != customers.end() ; ++target) {
 
-            if ((*source)->get_id() != (*target)->get_id()) {
-                long double cost = distance_cost_between(*source, *target);
+            if ((*source)->get_id() != (*target)->get_id() && check_edge(*source, *target)) {
+                long double cost = distance_between(*source, *target);
                 edges.push_back(new Edge(std::make_pair((*source)->get_id(), (*target)->get_id()), cost, this));
             }
-
         }
     }
 }
@@ -146,4 +154,14 @@ void Graph::print() {
 
     print_customers(customers);
     print_edges(edges);
+}
+
+bool Graph::check_edge(Customer *start, Customer *end) {
+    long double time_distance = distance_between(start, end);
+    if (start->get_demand() + end->get_demand() <= vehicle_capacity) {
+        if (start->get_earliest_time() + start->get_service_time() + time_distance <= end->get_latest_time()) {
+            return true;
+        }
+    }
+    return false;
 }

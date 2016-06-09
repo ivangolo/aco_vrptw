@@ -20,13 +20,13 @@ private:
 
 public:
     Customer(const int id, const double x, const double y, const int demand, const int earliest_time, const int latest_time, const int service_time, Graph *graph);
-    const int get_id() const;
-    const double get_x() const;
-    const double get_y() const;
-    const int get_demand() const;
-    const int get_earliest_time() const;
-    const int get_latest_time() const;
-    const int get_service_time() const;
+    int get_id();
+    double get_x();
+    double get_y();
+    int get_demand();
+    int get_earliest_time();
+    int get_latest_time();
+    int get_service_time();
     void print();
 };
 

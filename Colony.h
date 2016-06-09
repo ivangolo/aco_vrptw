@@ -13,10 +13,10 @@ private:
     const double beta;
     const double phi;  // pheromone's evaporation rate (global update)
     const double xi; // pheromone's evaporation rate (local update)
-    const double initial_pheromone;  // tau_0
     const int size;
     const int max_iterations;
     const double q0;
+    const double initial_pheromone;  // tau_0
     std::vector<Ant*> ants;
     Graph *graph;
     Solution *best_solution;
@@ -25,13 +25,9 @@ public:
     Colony(const double beta, const double phi, const double xi, const int size, const int max_iterations, const double q0, const double initial_pheromone, Graph *graph);
     ~Colony();
     void create_ants();
-    // const double get_alpha() const;
-    const double get_beta() const;
-    const double get_evaporation() const;
-    const double get_local_evaporation() const;
-    const int get_size() const;
-    const int get_max_iterations() const;
-    const double get_q0() const;
+    double get_beta();
+    double get_local_evaporation();
+    double get_q0();
     void deposit_initial_pheromone();
     void run();
     void step();
