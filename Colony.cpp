@@ -6,10 +6,15 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <iterator>
+#include <fstream>
+#include <iomanip>
+#include <ctime>
 
 Colony::Colony(const double beta, const double phi, const double xi, const int size, const int max_iterations, const double q0, const double initial_pheromone, Graph *graph) : beta(beta), phi(phi), xi(xi), size(size), max_iterations(max_iterations), q0(q0), initial_pheromone(initial_pheromone), graph(graph) {
     create_ants();
     best_solution = new Solution(graph);
+    deposit_initial_pheromone();
 }
 
 void Colony::create_ants() {
@@ -20,7 +25,8 @@ void Colony::create_ants() {
 
 Colony::~Colony() {
     std::for_each(ants.begin(), ants.end(), std::default_delete<Ant>());
-    delete best_solution;
+    std::for_each(pareto_front.begin(), pareto_front.end(), std::default_delete<Solution>());
+    // delete best_solution;
 }
 
 double Colony::get_beta(){
@@ -46,46 +52,177 @@ void Colony::run() {
         std::cout << "::::::::::::::::::::::::::::::::::Iteration: " << i << " :::::::::::::::::::::::::::::::::" << std::endl;
         step();
     }
+
+    save_pareto_front();
 }
 
 void Colony::save_best_solution() {
     std::vector<Ant*>::iterator min_ant = std::min_element(ants.begin(), ants.end(), [] (Ant *ant_a, Ant *ant_b) {
-        return ant_a->get_solution()->cost() < ant_b->get_solution()->cost();
+        return ant_a->get_solution()->distance() < ant_b->get_solution()->distance();
     });
 
-    if((*min_ant)->get_solution()->cost() < best_solution->cost() || best_solution->cost() == 0) {
-        best_solution->set_tour((*min_ant)->get_solution()->get_tour());
+    if((*min_ant)->get_solution()->distance() < best_solution->distance() || best_solution->distance() == 0) {
+        best_solution->set_paths((*min_ant)->get_solution()->get_paths());
     }
 }
 
 void Colony::restart_ants() {
-    for (std::vector<Ant*>::iterator ant = ants.begin(); ant != ants.end(); ++ant) {
-        (*ant)->restart();
+    for (auto ant : ants) {
+        ant->restart();
     }
 }
 
+// void Colony::global_update_pheromone_trail() {
+//     long double best_solution_cost = best_solution->distance();
+//     for (std::vector<Edge*>::const_iterator edge = best_solution->get_paths().begin(); edge != best_solution->get_paths().end(); ++edge) {
+//         long double old_pheromone = (*edge)->get_pheromone();
+//         long double new_pheromone = (1 - phi)*old_pheromone + phi*(1.0/best_solution_cost);
+//         (*edge)->set_pheromone(new_pheromone);
+//     }
+// }
+
 void Colony::global_update_pheromone_trail() {
-    long double best_solution_cost = best_solution->cost();
-    for (std::vector<int>::const_iterator v = best_solution->get_tour().begin(); v != best_solution->get_tour().end() - 1; ++v) {
-        Edge *edge = graph->get_edge(*v, *(v+1));
-        long double old_pheromone = edge->get_pheromone();
-        long double new_pheromone = (1 - phi)*old_pheromone + phi*(1.0/best_solution_cost);
-        edge->set_pheromone(new_pheromone);
+    std::vector<double> means = mean_objectives();
+
+    for (auto solution : pareto_front) {
+
+        for (auto edge : solution->get_paths()) {
+            long double old_pheromone = edge->get_pheromone();
+            long double new_pheromone = (1 - phi)*old_pheromone + phi*(1.0/(means[0]));
+            edge->set_pheromone(new_pheromone);
+        }
+
     }
+
 }
 
 void Colony::step() {
 
-    for (std::vector<Ant*>::iterator ant = ants.begin(); ant != ants.end(); ++ant) {
-        (*ant)->run();
+    for (auto ant : ants) {
+        ant->run();
+        ant->get_solution()->print_lite();
     }
 
-    // get best solution
-    save_best_solution();
-    std::cout << "Best solution: " << std::endl;
-    best_solution->print();
-    // global update of pheromone trails
+    update_pareto_front();
+
     global_update_pheromone_trail();
 
     restart_ants();
+
+    std::cout << ":::::::Pareto front:::::::" << std::endl;
+    print_pareto_front();
+}
+
+bool Colony::dominates(const std::vector<double> &v, const std::vector<double> &w) {
+    if (v == w) {
+        return false;
+    }
+
+    size_t sum = 0;
+    for (size_t i = 0; i < v.size(); ++i) {
+        sum += v[i] <= w[i];
+    }
+    return sum == v.size();
+}
+
+void Colony::update_pareto_front() {
+    for (auto ant : ants) {
+
+        if (pareto_front.empty()) {
+            pareto_front.push_back(new Solution(*(ant->get_solution())));
+            continue;
+        }
+
+        bool dominated = false;
+        std::vector<double> objectives = ant->get_solution()->objectives_values();
+        for (auto it = pareto_front.begin(); it != pareto_front.end();) {
+
+            if (dominates((*it)->objectives_values(), objectives)) {
+                dominated = true;
+                break;
+            }
+
+            if (dominates(objectives, (*it)->objectives_values())) {
+                delete *it;
+                it = pareto_front.erase(it);
+
+            } else {
+                ++it;
+            }
+
+        }
+
+        if (dominated) {
+            continue;
+        } else {
+            pareto_front.push_back(new Solution(*(ant->get_solution())));
+        }
+    }
+
+}
+
+std::vector<double> Colony::mean_objectives() {
+    std::vector<double> mean_objectives = pareto_front.front()->objectives_values();
+    size_t size = mean_objectives.size();
+    std::for_each(pareto_front.begin() + 1, pareto_front.end(), [&mean_objectives, size] (Solution *solution) {
+        std::vector<double> objectives = solution->objectives_values();
+
+        for (size_t i = 0; i < size; ++i) {
+            mean_objectives[i] += objectives[i];
+        }
+
+    });
+
+    for (size_t i = 0; i < size; ++i) {
+        mean_objectives[i] /= pareto_front.size();
+    }
+
+    // distance, vehicles, balance, waiting time
+    return mean_objectives;
+}
+
+void Colony::save_pareto_front() {
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
+    char datetime[50];
+    std::strftime(datetime, sizeof(datetime), "%Y%m%d%H%M%S", &tm);
+    std::string directory = "../pareto/";
+    std::string filename_parameters = directory + std::string(datetime) + std::to_string(graph->get_customers_number()) + "_" + graph->get_name() + "_" + "parameters.txt";
+    std::string filename_solutions = directory + std::string(datetime) + std::to_string(graph->get_customers_number()) + "_" + graph->get_name() + "_" + "pareto.txt";
+    std::ofstream parameters_file(filename_parameters);
+    std::ofstream pareto_file(filename_solutions);
+
+    parameters_file << "Instance name: " << graph->get_name() << std::endl;
+    parameters_file << "Total customers: " << graph->get_customers_number() << std::endl;
+    parameters_file << "ACS parameters: " << std::endl;
+    parameters_file << "\tBeta: " << beta << std::endl;
+    parameters_file << "\tPhi: " << phi << std::endl;
+    parameters_file << "\tXi: " << xi << std::endl;
+    parameters_file << "\tAnts: " << size << std::endl;
+    parameters_file << "\tq0: " << q0 << std::endl;
+    parameters_file << "\tMax. iterations: " << max_iterations << std::endl;
+    parameters_file << "\tInitial pheromone: " << initial_pheromone << std::endl;
+    parameters_file << "\tNumber of solutions: " << pareto_front.size() << std::endl;
+
+    pareto_file << "#" << std::endl;
+    for (auto solution : pareto_front) {
+        std::vector<double> v = solution->objectives_values();
+        for (size_t i = 0; i < v.size(); ++i) {
+            pareto_file << v[i] << " ";
+        }
+        pareto_file << std::endl;
+    }
+
+    parameters_file.close();
+    pareto_file.close();
+}
+
+void Colony::print_pareto_front() {
+    for (auto solution : pareto_front) {
+        std::vector<double> v = solution->objectives_values();
+        for (size_t i = 0; i < v.size(); ++i) {
+            std::cout << v[i] << " ";
+        }
+        std::cout << std::endl;
+    }
 }

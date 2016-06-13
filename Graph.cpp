@@ -56,15 +56,6 @@ Customer* Graph::get_customer(int id) {
     return customers[id];
 }
 
-// Edge* Graph::get_edge(int i, int j) {
-//     std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [i, j] (Edge *edge) {
-//                         int first = edge->get_components().first;
-//                         int second = edge->get_components().second;
-//                         return ((i == first && j == second) || (i == second && j == first));
-//                     });
-//     return *it;
-// }
-
 Edge* Graph::get_edge(int start, int end) {
     std::vector<Edge*>::iterator it =  find_if(edges.begin(), edges.end(), [start, end] (Edge *edge) {
                         int first = edge->get_components().first;
@@ -126,7 +117,7 @@ std::vector<int> Graph::get_customers_ids() {
 }
 
 unsigned long Graph::get_customers_number() {
-    return customers.size();
+    return customers.size() - 1;
 }
 
 void Graph::print_customers(std::vector<Customer*> customers_vec) {

@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     std::ifstream fin_instance(instance_filename);
     if(!fin_instance.is_open()) {
-        std::cerr << "Error al intentar abrir el archivo " << instance_filename << ". " << strerror(errno) <<       std::endl;
+        std::cerr << "Error al intentar abrir el archivo " << instance_filename << ". " << strerror(errno) << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -75,10 +75,10 @@ int main(int argc, char *argv[]) {
     fin_instance.close();
     Colony *ant_colony;
     ant_colony = new Colony(beta, phi, xi, colony_size, max_iterations, q0, initial_pheromone, graph);  // beta, evaporation, local evaporation, ants, iterations, q0, initial pheromone, graph pointer
-    ant_colony->deposit_initial_pheromone();
     ant_colony->run();
     delete ant_colony;
     delete graph;
+
 
 }
 

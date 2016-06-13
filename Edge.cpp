@@ -48,3 +48,7 @@ void Edge::print() {
     std::cout << "Pheromone: " << pheromone << std::endl;
     std::cout << "Etha: " << etha << std::endl;
 }
+
+void Edge::print_components() {
+    std::cout << "(" << components.first << ", " << components.second <<  ")";
+}

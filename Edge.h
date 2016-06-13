@@ -29,6 +29,7 @@ public:
     void set_initial_pheromone(long double initial_pheromone);
     void set_pheromone(long double pheromone);
     void print();
+    void print_components();
 };
 
 

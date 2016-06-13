@@ -85,7 +85,7 @@ Customer* Ant::random_proportional_rule(Customer *last_vertex) {
         return NULL;
     }
     long double sum_weights = 0;
-    std::deque<std::pair<Edge*, long double>> weights;
+    std::vector<std::pair<Edge*, long double>> weights;
     std::for_each(edges.begin(), edges.end(), [this, &weights, &sum_weights](Edge* edge) {
         long double weight = edge->get_pheromone() * std::pow(edge->get_etha(), colony->get_beta());
         weights.push_back(std::make_pair(edge, weight));
@@ -105,39 +105,43 @@ Customer* Ant::random_proportional_rule(Customer *last_vertex) {
 }
 
 void Ant::make_customer_visited(int customer_id) {
-    solution->add_customer(customer_id);
+    // solution->add_customer(customer_id);
     unvisited_customers.erase(std::remove(unvisited_customers.begin(), unvisited_customers.end(), customer_id), unvisited_customers.end());
 }
 
 void Ant::return_to_the_depot() {
-    solution->add_customer(0);
+    // solution->add_customer(0);
     last_arrival_time = graph->get_customer(0)->get_earliest_time();
     remaining_capacity = graph->get_vehicle_capacity();
 }
 
 void Ant::run() {
-    solution->add_customer(0); // depot as starting point
-    while(!unvisited_customers.empty()) {
-        Customer *last_visited = solution->last_visited_vertex();
-        Customer *next_customer = next_move(last_visited);
-
+    Customer *last_visited = graph->get_customer(0);
+    do {
+        Customer* next_customer = next_move(last_visited);
         if (next_customer) {
-            // update last arrival time
-            update_last_arrival_time(last_visited, next_customer);
-            // decreasing capacity
-            update_capacity(next_customer);
-            // add the next customer to the solution and remove it from unvisited customers
-            make_customer_visited(next_customer->get_id());
-            // do local pheromone trail update
-            local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), next_customer->get_id()));
-        } else {
-            // Return to the depot
-            return_to_the_depot();
-            // do local pheromone trail update
-            local_pheromone_trail_update(graph->get_edge(last_visited->get_id(), 0));
-        }
-    }
-    solution->add_customer(0); // depot as final point
+           Edge *path = graph->get_edge(last_visited->get_id(), next_customer->get_id());
+           // update last arrival time
+           update_last_arrival_time(last_visited, next_customer);
+           // decreasing capacity
+           update_capacity(next_customer);
+           // add the next customer to the solution and remove it from unvisited customers
+           solution->add_edge(path);
+           unvisited_customers.erase(std::remove(unvisited_customers.begin(), unvisited_customers.end(), next_customer->get_id()), unvisited_customers.end());
+           // do local pheromone trail update
+           local_pheromone_trail_update(path);
+       } else {
+           // Return to the depot
+           Edge *path = graph->get_edge(last_visited->get_id(), 0);
+           solution->add_edge(path);
+           last_arrival_time = graph->get_customer(0)->get_earliest_time();
+           remaining_capacity = graph->get_vehicle_capacity();
+           // do local pheromone trail update
+           local_pheromone_trail_update(path);
+       }
+       last_visited = solution->last_visited_customer();
+    } while(!unvisited_customers.empty());
+    solution->add_edge(graph->get_edge(last_visited->get_id(), 0));
 }
 
 void Ant::local_pheromone_trail_update(Edge *edge) {
