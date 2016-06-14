@@ -208,6 +208,7 @@ void Colony::save_pareto_front() {
         }
         pareto_file << std::endl;
     }
+    pareto_file << "#" << std::endl;
 
     parameters_file.close();
     pareto_file.close();
