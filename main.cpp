@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
     delete ant_colony;
     delete graph;
 
-
 }
 
 void print_usage() {

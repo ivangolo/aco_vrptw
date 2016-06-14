@@ -30,6 +30,14 @@ void Solution::print_lite() {
     std::cout << std::endl;
 }
 
+void Solution::print_tour() {
+    std::vector<int> t = tour();
+    for (size_t i = 0; i < t.size(); ++i) {
+        std::cout << t[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 double Solution::distance() {
     if(paths.empty()) {
         return 0;
@@ -115,4 +123,13 @@ void Solution::set_paths(std::vector<Edge *> paths) {
 std::vector<double> Solution::objectives_values() {
     std::vector<double> objectives {distance(), balance()};
     return objectives;
+}
+
+std::vector<int> Solution::tour() {
+    std::vector<int> tour;
+    tour.push_back(0);
+    for (auto edge : paths) {
+        tour.push_back(edge->get_components().second);
+    }
+    return tour;
 }

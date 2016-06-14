@@ -72,15 +72,6 @@ void Colony::restart_ants() {
     }
 }
 
-// void Colony::global_update_pheromone_trail() {
-//     long double best_solution_cost = best_solution->distance();
-//     for (std::vector<Edge*>::const_iterator edge = best_solution->get_paths().begin(); edge != best_solution->get_paths().end(); ++edge) {
-//         long double old_pheromone = (*edge)->get_pheromone();
-//         long double new_pheromone = (1 - phi)*old_pheromone + phi*(1.0/best_solution_cost);
-//         (*edge)->set_pheromone(new_pheromone);
-//     }
-// }
-
 void Colony::global_update_pheromone_trail() {
     std::vector<double> means = mean_objectives();
 
@@ -100,7 +91,6 @@ void Colony::step() {
 
     for (auto ant : ants) {
         ant->run();
-        ant->get_solution()->print_lite();
     }
 
     update_pareto_front();
@@ -134,11 +124,17 @@ void Colony::update_pareto_front() {
         }
 
         bool dominated = false;
+        bool present = false;
         std::vector<double> objectives = ant->get_solution()->objectives_values();
         for (auto it = pareto_front.begin(); it != pareto_front.end();) {
 
             if (dominates((*it)->objectives_values(), objectives)) {
                 dominated = true;
+                break;
+            }
+
+            if (ant->get_solution()->tour() == (*it)->tour()) {
+                present = true;
                 break;
             }
 
@@ -152,7 +148,7 @@ void Colony::update_pareto_front() {
 
         }
 
-        if (dominated) {
+        if (dominated || present) {
             continue;
         } else {
             pareto_front.push_back(new Solution(*(ant->get_solution())));

@@ -19,6 +19,7 @@ public:
     Customer* last_visited_customer();
     void print();
     void print_lite();
+    void print_tour();
     const std::vector<Edge*>& get_paths() const;
     void set_paths(std::vector<Edge*> paths);
     void restart();
@@ -27,6 +28,8 @@ public:
     int number_of_vehicles();
     double waiting_time();
     std::vector<double> objectives_values();
+    std::vector<int> tour();
+
 };
 
 
