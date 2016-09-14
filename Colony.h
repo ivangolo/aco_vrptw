@@ -18,7 +18,6 @@ private:
     const double initial_pheromone;  // tau_0
     std::vector<Ant*> ants;
     Graph *graph;
-    Solution *best_solution;
     std::vector<Solution*> pareto_front;
 
 public:
@@ -31,7 +30,6 @@ public:
     void deposit_initial_pheromone();
     void run();
     void step();
-    void save_best_solution();
     void global_update_pheromone_trail();
     void restart_ants();
     bool dominates(const std::vector<double> &v, const std::vector<double> &w);
@@ -40,11 +38,5 @@ public:
     void save_pareto_front();
     void print_pareto_front();
 
-
-    /*
-    Un vector u = {u_1, u_2, ..., u_k} domina a otro v = {v_1, v_2, ..., v_k}
-    si y solo si u es parcialmente menor a v, i.e, para todo i en {1, 2, ..., k},
-    u_i <= v_i y existe al menos un i en {1, 2, ..., k} tal que u_i < v_i.
-    */
 };
 #endif //VRPTW_ACO_COLONY_H

@@ -14,6 +14,7 @@ private:
     int vehicle_number;
     int vehicle_capacity;
     std::string name;
+    std::vector<char> objectives;
     std::vector<Customer*> customers;
     std::vector<Edge*> edges;
 
@@ -23,6 +24,8 @@ public:
     ~Graph();
     int get_vehicle_number();
     int get_vehicle_capacity();
+    void set_objectives(std::vector<char> objectives);
+    std::vector<char> get_objectives();
     unsigned long get_customers_number();
     std::string get_name();
     Customer* get_customer(int id);
@@ -31,6 +34,7 @@ public:
     void create_edges();
     bool check_edge(Customer *start, Customer *end);
     void print();
+    void print_objectives();
     void print_customers(std::vector<Customer*> customers_vec);
     void print_edges(std::vector<Edge*> edges_vec);
     const std::vector<Customer*>& get_customers() const ;

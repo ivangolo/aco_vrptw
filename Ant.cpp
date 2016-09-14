@@ -94,7 +94,7 @@ Customer* Ant::random_proportional_rule(Customer *last_vertex) {
 
     long double pick = generate_random_number() * sum_weights;
     long double current = 0;
-    auto weight = weights.begin();
+    auto weight = weights.begin();  
     for (; weight != weights.end(); ++weight) {
         current += (*weight).second;
         if (current >= pick) {
@@ -142,6 +142,7 @@ void Ant::run() {
        last_visited = solution->last_visited_customer();
     } while(!unvisited_customers.empty());
     solution->add_edge(graph->get_edge(last_visited->get_id(), 0));
+    solution->calc_objectives();
 }
 
 void Ant::local_pheromone_trail_update(Edge *edge) {

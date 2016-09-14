@@ -156,3 +156,17 @@ bool Graph::check_edge(Customer *start, Customer *end) {
     }
     return false;
 }
+
+void Graph::set_objectives(std::vector<char> objectives) {
+    this->objectives = objectives;
+}
+
+std::vector<char> Graph::get_objectives() {
+    return objectives;
+}
+
+void Graph::print_objectives() {
+    for (auto o : objectives) {
+        std::cout << o << " ";
+    }
+}

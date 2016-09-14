@@ -38,20 +38,20 @@ void Solution::print_tour() {
     std::cout << std::endl;
 }
 
-double Solution::distance() {
+void Solution::calc_distance() {
     if(paths.empty()) {
-        return 0;
+        this->distance_ = 0;
     }
     double distance = 0;
     std::for_each(paths.begin(), paths.end(), [&distance] (Edge *edge) {
         distance += edge->get_distance_cost();
     });
-    return distance;
+    this->distance_ = distance;
 }
 
-int Solution::number_of_vehicles() {
+void Solution::calc_number_of_vehicles() {
     if (paths.empty()) {
-        return 0;
+        this->number_of_vehicles_ = 0;
     }
     int number_of_vehicles = 0;
     std::for_each(paths.begin(), paths.end(), [&number_of_vehicles] (Edge* edge) {
@@ -59,14 +59,14 @@ int Solution::number_of_vehicles() {
             number_of_vehicles++;
         }
     });
-    return number_of_vehicles;
+    this->number_of_vehicles_ = number_of_vehicles;
 }
 
 void Solution::restart() {
     std::vector<Edge*>().swap(paths);
 }
 
-double Solution::balance() {
+void Solution::calc_balance() {
     double tmp = 0;
     std::vector<double> distances;
     std::for_each(paths.begin(), paths.end(), [&tmp, &distances] (Edge *edge) {
@@ -78,10 +78,10 @@ double Solution::balance() {
     });
     auto min = std::min_element(distances.begin(), distances.end());
     auto max = std::max_element(distances.begin(), distances.end());
-    return *max - *min;
+    this->balance_ = *max - *min;
 }
 
-double Solution::waiting_time() {
+void Solution::calc_waiting_time() {
     double waiting_time = 0;
     double last_arrival_time = 0;
     std::for_each(paths.begin(), paths.end(), [this, &waiting_time, &last_arrival_time] (Edge *edge) {
@@ -101,7 +101,7 @@ double Solution::waiting_time() {
         }
 
     });
-    return waiting_time;
+    this->waiting_time_ = waiting_time;
 }
 
 void Solution::add_edge(Edge *edge) {
@@ -120,9 +120,39 @@ void Solution::set_paths(std::vector<Edge *> paths) {
     this->paths = paths;
 }
 
+double Solution::balance() {
+    return balance_;
+}
+
+double Solution::distance() {
+    return distance_;
+}
+
+double Solution::waiting_time() {
+    return waiting_time_;
+}
+
+int Solution::number_of_vehicles() {
+    return number_of_vehicles_;
+}
+
 std::vector<double> Solution::objectives_values() {
-    std::vector<double> objectives {distance(), balance()};
-    return objectives;
+    std::vector<char> objectives = graph->get_objectives();
+    std::vector<double> values;
+    for (auto o : objectives) {
+        switch (o) {
+            case 'b': values.push_back(balance());
+                break;
+            case 'd': values.push_back(distance());
+                break;
+            case 'v': values.push_back((double)number_of_vehicles());
+                break;
+            // case 'w': values.push_back(waiting_time());
+            //     break;
+            default:;
+        }
+    }
+    return values;
 }
 
 std::vector<int> Solution::tour() {
@@ -132,4 +162,11 @@ std::vector<int> Solution::tour() {
         tour.push_back(edge->get_components().second);
     }
     return tour;
+}
+
+void Solution::calc_objectives() {
+    calc_balance();
+    calc_distance();
+    calc_number_of_vehicles();
+    // calc_waiting_time();
 }
